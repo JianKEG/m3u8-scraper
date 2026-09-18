@@ -44,7 +44,11 @@ let browser = null;
 let browserContext = null;
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: true,
+  methods: ['GET', 'OPTIONS'],
+  credentials: true,
+}));
 
 async function validateStreamUrl(url) {
   if (!url) return false;
@@ -59,7 +63,10 @@ async function validateStreamUrl(url) {
         redirect: 'follow',
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Paddock-URL-Validator'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': '*/*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cache-Control': 'no-cache',
         }
       });
 
