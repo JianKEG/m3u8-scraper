@@ -44,10 +44,39 @@ let browser = null;
 let browserContext = null;
 
 const app = express();
+const allowedOrigins = [
+  'https://najilili-paddock.vercel.app',
+  'https://www.najilili-paddock.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:8000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:8000'
+];
+
 app.use(cors({
-  origin: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error('CORS blocked for origin: ' + origin));
+  },
   methods: ['GET', 'OPTIONS'],
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.options('*', cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error('CORS blocked for origin: ' + origin));
+  },
+  methods: ['GET', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 async function validateStreamUrl(url) {
