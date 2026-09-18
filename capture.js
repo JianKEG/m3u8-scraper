@@ -88,7 +88,7 @@ async function ensureBrowserContext() {
     ]
   };
 
-  launchOptions.channel = BROWSER_CHANNEL || 'msedge';
+  if (BROWSER_CHANNEL) launchOptions.channel = BROWSER_CHANNEL;
   if (BROWSER_EXECUTABLE_PATH) launchOptions.executablePath = BROWSER_EXECUTABLE_PATH;
 
   browser = await chromium.launch(launchOptions);
