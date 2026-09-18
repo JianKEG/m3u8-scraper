@@ -54,28 +54,21 @@ async function validateStreamUrl(url) {
   if (!url) return false;
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), VALIDATION_TIMEOUT_MS);
+    const ctx = await ensureBrowserContext();
+    const page = await ctx.newPage();
 
     try {
-      const res = await fetch(url, {
-        method: 'GET',
-        redirect: 'follow',
-        signal: controller.signal,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': '*/*',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Cache-Control': 'no-cache',
-        }
+      const response = await page.goto(url, {
+        waitUntil: 'domcontentloaded',
+        timeout: VALIDATION_TIMEOUT_MS,
       });
 
-      if (!res.ok) return false;
+      if (!response || !response.ok()) return false;
 
-      const text = await res.text();
+      const text = await response.text();
       return typeof text === 'string' && text.trim().startsWith('#EXTM3U');
     } finally {
-      clearTimeout(timeout);
+      await page.close();
     }
   } catch (error) {
     return false;
