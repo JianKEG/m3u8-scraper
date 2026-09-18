@@ -63,10 +63,17 @@ async function validateStreamUrl(url) {
         timeout: VALIDATION_TIMEOUT_MS,
       });
 
-      if (!response || !response.ok()) return false;
+      if (!response) return false;
+      if (response.status() >= 400) return false;
 
       const text = await response.text();
-      return typeof text === 'string' && text.trim().startsWith('#EXTM3U');
+      const cleaned = typeof text === 'string' ? text.trim() : '';
+
+      if (!cleaned || cleaned.includes('Content unavailable') || cleaned.includes('Forbidden')) {
+        return false;
+      }
+
+      return cleaned.startsWith('#EXTM3U');
     } finally {
       await page.close();
     }
